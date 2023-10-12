@@ -1,5 +1,25 @@
 from dataclasses import asdict, dataclass
 
+'''
+        raise NotImplementedError(
+            f'Method "get_spent_calories" in class '
+            f'"{type(self).__name__}" not defined'
+            )
+
+при таком расположении скобок flake8 пишет
+E123 closing bracket does not match indentation of opening bracket's line
+и я не могу отправить работу на проверку
+
+        raise NotImplementedError(
+            f'Method "get_spent_calories" in class '
+            f'"{type(self).__name__}" not defined')
+
+а при таком не ругается, но я так понял, это плохо,
+так как быть если в таком виде работа не принимается?
+
+Или я что не так делаю?
+'''
+
 
 @dataclass
 class InfoMessage:
@@ -58,8 +78,7 @@ class InfoMessage:
             f'{self.TIME.format(**asdict(self))}'
             f'{self.DIST.format(**asdict(self))}'
             f'{self.SPEED.format(**asdict(self))}'
-            f'{self.CALORIES.format(**asdict(self))}'
-            )
+            f'{self.CALORIES.format(**asdict(self))}')
 
 
 '''
@@ -161,8 +180,7 @@ class Training:
         """Get the number of calories consumed."""
         raise NotImplementedError(
             f'Method "get_spent_calories" in class '
-            f'"{type(self).__name__}" not defined'
-            )
+            f'"{type(self).__name__}" not defined')
 
     def show_training_info(self) -> InfoMessage:
         """Return an informational message about the completed training."""
@@ -171,8 +189,7 @@ class Training:
             self.duration,
             self.get_distance(),
             self.get_mean_speed(),
-            self.get_spent_calories()
-            )
+            self.get_spent_calories())
 
 
 class Running(Training):
@@ -202,8 +219,7 @@ class Running(Training):
         return (
             (self.RATIO_SPEED * self.get_mean_speed()
              + self.RATIO_SPEED_SHIFT) * self.weight
-            / self.M_IN_KM * (self.duration * self.MIN_IN_HR)
-            )
+            / self.M_IN_KM * (self.duration * self.MIN_IN_HR))
 
 
 class SportsWalking(Training):
@@ -273,8 +289,7 @@ class SportsWalking(Training):
             (self.CALORIES_QUOTIENT_1 * self.weight + (((self.get_mean_speed()
              * self.KM_IN_M_SEC)**2) / (self.height / self.CENTIM_IN_M))
              * self.CALORIES_QUOTIENT_2 * self.weight)
-            * (self.duration * self.MIN_IN_HR)
-            )
+            * (self.duration * self.MIN_IN_HR))
 
 
 class Swimming(Training):
@@ -347,15 +362,13 @@ class Swimming(Training):
         """Get the average swimming speed."""
         return (
             self.length_pool * self.count_pool
-            / self.M_IN_KM / self.duration
-            )
+            / self.M_IN_KM / self.duration)
 
     def get_spent_calories(self):
         """Get the number of calories consumed."""
         return (
             (self.get_mean_speed() + self.SHIFT_MEAN_SPEED)
-            * self.FACTOR * self.weight * self.duration
-            )
+            * self.FACTOR * self.weight * self.duration)
 
 
 def read_package(workout_type: str, data: list[int]) -> Training:
@@ -378,8 +391,7 @@ def read_package(workout_type: str, data: list[int]) -> Training:
     types_training: dict[str, type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
-        'WLK': SportsWalking
-        }
+        'WLK': SportsWalking}
     # return types_training.get(workout_type, None)(*data)
     try:
         value = types_training[workout_type](*data)
@@ -415,34 +427,8 @@ if __name__ == '__main__':
     packages = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
-        ('WLK', [9000, 1, 75, 180]),]
+        ('WLK', [9000, 1, 75, 180])]
 
     for workout_type, data in packages:
         training = read_package(workout_type, data)
         main(training)
-
-'''
-        raise NotImplementedError(
-            f'Method "get_spent_calories" in class '
-            f'"{type(self).__name__}" not defined'
-            )
-
-при таком расположении скобок flake8 пишет
-E123 closing bracket does not match indentation of opening bracket's line
-
-        raise NotImplementedError(
-            f'Method "get_spent_calories" in class '
-            f'"{type(self).__name__}" not defined')
-
-а при таком не ругается, но я так понял, это плохо,
-значит не обращать на него внимания?
-
-а при таком:
-        raise NotImplementedError(
-            f'Method "get_spent_calories" in class '
-            f'"{type(self).__name__}" not defined'
-                                 )
-
-пишет E126 continuation line over-indented for hanging indent
-где истина?)
-'''

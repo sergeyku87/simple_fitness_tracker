@@ -329,7 +329,8 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list[int]) -> Union[Running,
                                                               Swimming,
-                                                              SportsWalking]:
+                                                              SportsWalking,
+                                                              Training]:
     """
     Simulation of receiving data from sensors.
 
@@ -347,7 +348,7 @@ def read_package(workout_type: str, data: list[int]) -> Union[Running,
     instance of the class
     """
     types_training: dict[
-        str, type[Union[Running, Swimming, SportsWalking]]
+        str, type[Union[Running, Swimming, SportsWalking, Training]]
     ] = {
         'SWM': Swimming,
         'RUN': Running,
@@ -359,7 +360,7 @@ def read_package(workout_type: str, data: list[int]) -> Union[Running,
         raise KeyError
 
 
-def main(training: Union[Running, Swimming, SportsWalking]) -> None:
+def main(training: Union[Running, Swimming, SportsWalking, Training]) -> None:
     """
     Main function.
 

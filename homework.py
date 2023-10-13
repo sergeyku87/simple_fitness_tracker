@@ -1,30 +1,11 @@
 from dataclasses import asdict, dataclass
-
-'''
-        raise NotImplementedError(
-            f'Method "get_spent_calories" in class '
-            f'"{type(self).__name__}" not defined'
-            )
-
-при таком расположении скобок flake8 пишет
-E123 closing bracket does not match indentation of opening bracket's line
-и я не могу отправить работу на проверку
-
-        raise NotImplementedError(
-            f'Method "get_spent_calories" in class '
-            f'"{type(self).__name__}" not defined')
-
-а при таком не ругается, но я так понял, это плохо,
-так как быть если в таком виде работа не принимается?
-
-Или я что не так делаю?
-'''
+from typing import ClassVar, Union
 
 
 @dataclass
 class InfoMessage:
     """
-    A class for storing and displaying information
+    A class for storing and displaying information.
 
     ...
 
@@ -65,47 +46,17 @@ class InfoMessage:
     speed: float
     calories: float
 
-    TYPE: str = 'Тип тренировки: {training_type}; '
-    TIME: str = 'Длительность: {duration:.3f} ч.; '
-    DIST: str = 'Дистанция: {distance:.3f} км; '
-    SPEED: str = 'Ср. скорость: {speed:.3f} км/ч; '
-    CALORIES: str = 'Потрачено ккал: {calories:.3f}.'
+    MESSAGE: ClassVar[str] = (
+        'Тип тренировки: {training_type}; '
+        'Длительность: {duration:.3f} ч.; '
+        'Дистанция: {distance:.3f} км; '
+        'Ср. скорость: {speed:.3f} км/ч; '
+        'Потрачено ккал: {calories:.3f}.'
+    )
 
-    def get_message(self):
+    def get_message(self) -> str:
         """Displays a message about the training session."""
-        return (
-            f'{self.TYPE.format(**asdict(self))}'
-            f'{self.TIME.format(**asdict(self))}'
-            f'{self.DIST.format(**asdict(self))}'
-            f'{self.SPEED.format(**asdict(self))}'
-            f'{self.CALORIES.format(**asdict(self))}')
-
-
-'''
-#Привет, если я правильно объявил константы
-#в классе, то можно ли их не объявлять,
-#пусть функция сама все считает, как в примере
-#ниже? asdict(self) == self.__dict__
-#значит можно либо то, либо то использовать?
-
-
-    def get_message2(self):
-        _type = 'Тип тренировки: {training_type}; '.format(**asdict(self))
-        _time = 'Длительность: {duration:.3f} ч.; '.format(**asdict(self))
-        _dist = 'Дистанция: {distance:.3f} км; '.format(**asdict(self))
-        _speed = 'Ср. скорость: {speed:.3f} км/ч; '.format(**asdict(self))
-        _cal = 'Потрачено ккал: {calories:.3f}.'.format(**asdict(self))
-        return f'{_type}{_time}{_dist}{_speed}{_cal}'
-
-    def get_message3(self):
-        _type = 'Тип тренировки: {training_type}; '.format(**self.__dict__)
-        _time = 'Длительность: {duration:.3f} ч.; '.format(**self.__dict__)
-        _dist = 'Дистанция: {distance:.3f} км; '.format(**self.__dict__)
-        _speed = 'Ср. скорость: {speed:.3f} км/ч; '.format(**self.__dict__)
-        _cal = 'Потрачено ккал: {calories:.3f}.'.format(**self.__dict__)
-        return f'{_type}{_time}{_dist}{_speed}{_cal}'
-
-'''
+        return self.MESSAGE.format(**asdict(self))
 
 
 class Training:
@@ -144,7 +95,7 @@ class Training:
 
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
-    MIN_IN_HR = 60
+    MIN_IN_HR: int = 60
 
     def __init__(self,
                  action: int,
@@ -152,7 +103,7 @@ class Training:
                  weight: float,
                  ) -> None:
         """
-        Sets all the necessary attributes for the object
+        Sets all the necessary attributes for the object.
 
 
         Parameters
@@ -179,7 +130,7 @@ class Training:
     def get_spent_calories(self) -> float:
         """Get the number of calories consumed."""
         raise NotImplementedError(
-            f'Method "get_spent_calories" in class '
+            'Method "get_spent_calories" in class '
             f'"{type(self).__name__}" not defined')
 
     def show_training_info(self) -> InfoMessage:
@@ -189,12 +140,13 @@ class Training:
             self.duration,
             self.get_distance(),
             self.get_mean_speed(),
-            self.get_spent_calories())
+            self.get_spent_calories()
+        )
 
 
 class Running(Training):
     """
-    Class describing the type of training: Running
+    Class describing the type of training: Running.
 
     ...
 
@@ -207,37 +159,38 @@ class Running(Training):
 
     Methods
     -------
-    get_spent_calories()
+    get_spent_calories() -> float
         redefined method of the base class
     """
 
     RATIO_SPEED: int = 18
     RATIO_SPEED_SHIFT: float = 1.79
 
-    def get_spent_calories(self):
+    def get_spent_calories(self) -> float:
         """Get the number of calories consumed."""
         return (
             (self.RATIO_SPEED * self.get_mean_speed()
              + self.RATIO_SPEED_SHIFT) * self.weight
-            / self.M_IN_KM * (self.duration * self.MIN_IN_HR))
+            / self.M_IN_KM * (self.duration * self.MIN_IN_HR)
+        )
 
 
 class SportsWalking(Training):
     """
-    Class describing the type of training: SportsWalking
+    Class describing the type of training: SportsWalking.
 
 
     ...
 
     Attributes
     ----------
-    CALORIES_QUOTIENT_1: float
+    RATIO_WEIGHT_USER: float
         coefficient from the formula
-    CALORIES_QUOTIENT_2: float
+    RATIO_WEIGHT_SPEED_USER: float
         coefficient from the formula
-    KM_IN_M_SEC: float
+    KMH_IN_MSEC: float
         the number for converting kilometers per hour to meters per second
-    CENTIM_IN_M: int
+    CM_IN_M: int
         number of centimeters per meter
     action: int
         number of movements per training
@@ -254,10 +207,10 @@ class SportsWalking(Training):
         redefined method of the base class
     """
 
-    CALORIES_QUOTIENT_1: float = 0.035
-    CALORIES_QUOTIENT_2: float = 0.029
-    KM_IN_M_SEC: float = 0.278
-    CENTIM_IN_M: int = 100
+    RATIO_WEIGHT_USER: float = 0.035
+    RATIO_WEIGHT_SPEED_USER: float = 0.029
+    KMH_IN_MSEC: float = 0.278
+    CM_IN_M: int = 100
 
     def __init__(self,
                  action: int,
@@ -266,7 +219,7 @@ class SportsWalking(Training):
                  height: float
                  ) -> None:
         """
-        Sets attributes from the base class and adds its own
+        Sets attributes from the base class and adds its own.
 
 
         Parameters
@@ -286,15 +239,16 @@ class SportsWalking(Training):
     def get_spent_calories(self):
         """Get the number of calories consumed."""
         return (
-            (self.CALORIES_QUOTIENT_1 * self.weight + (((self.get_mean_speed()
-             * self.KM_IN_M_SEC)**2) / (self.height / self.CENTIM_IN_M))
-             * self.CALORIES_QUOTIENT_2 * self.weight)
-            * (self.duration * self.MIN_IN_HR))
+            (self.RATIO_WEIGHT_USER * self.weight + (((self.get_mean_speed()
+             * self.KMH_IN_MSEC)**2) / (self.height / self.CM_IN_M))
+             * self.RATIO_WEIGHT_SPEED_USER * self.weight)
+            * (self.duration * self.MIN_IN_HR)
+        )
 
 
 class Swimming(Training):
     """
-    Class describing the type of training: Swimming
+    Class describing the type of training: Swimming.
 
 
     ...
@@ -320,9 +274,9 @@ class Swimming(Training):
 
     Methods
     -------
-    get_mean_speed()
+    get_mean_speed() -> float
         redefined method of the base class
-    get_spent_calories()
+    get_spent_calories() -> float
         redefined method of the base class
     """
 
@@ -338,7 +292,7 @@ class Swimming(Training):
                  count_pool: int
                  ) -> None:
         """
-        Sets attributes from the base class and adds its own
+        Sets attributes from the base class and adds its own.
 
 
         Parameters
@@ -358,20 +312,24 @@ class Swimming(Training):
         self.length_pool = length_pool
         self.count_pool = count_pool
 
-    def get_mean_speed(self):
+    def get_mean_speed(self) -> float:
         """Get the average swimming speed."""
         return (
             self.length_pool * self.count_pool
-            / self.M_IN_KM / self.duration)
+            / self.M_IN_KM / self.duration
+        )
 
-    def get_spent_calories(self):
+    def get_spent_calories(self) -> float:
         """Get the number of calories consumed."""
         return (
             (self.get_mean_speed() + self.SHIFT_MEAN_SPEED)
-            * self.FACTOR * self.weight * self.duration)
+            * self.FACTOR * self.weight * self.duration
+        )
 
 
-def read_package(workout_type: str, data: list[int]) -> Training:
+def read_package(workout_type: str, data: list[int]) -> Union[Running,
+                                                              Swimming,
+                                                              SportsWalking]:
     """
     Simulation of receiving data from sensors.
 
@@ -388,27 +346,22 @@ def read_package(workout_type: str, data: list[int]) -> Training:
     Returns:
     instance of the class
     """
-    types_training: dict[str, type[Training]] = {
+    types_training: dict[
+        str, type[Union[Running, Swimming, SportsWalking]]
+    ] = {
         'SWM': Swimming,
         'RUN': Running,
-        'WLK': SportsWalking}
-    # return types_training.get(workout_type, None)(*data)
+        'WLK': SportsWalking
+    }
     try:
-        value = types_training[workout_type](*data)
-    except KeyError as exp:
-        print(exp)
-    return value
+        return types_training[workout_type](*data)
+    except KeyError:
+        raise KeyError
 
 
-def main(training: Training) -> None:
-    '''
-    я тут запутался, разве training: Training не подразумевает,
-    что training бдет получать объекты класса, которые в свою
-    очередь наследуются от Training, ведь функция read_package
-    как раз и возвращает такие объекты?
-    '''
+def main(training: Union[Running, Swimming, SportsWalking]) -> None:
     """
-    Main function
+    Main function.
 
     Arguments:
     training: accepts an instance of the class
@@ -427,7 +380,8 @@ if __name__ == '__main__':
     packages = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
-        ('WLK', [9000, 1, 75, 180])]
+        ('WLK', [9000, 1, 75, 180])
+    ]
 
     for workout_type, data in packages:
         training = read_package(workout_type, data)

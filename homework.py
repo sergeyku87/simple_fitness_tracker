@@ -348,7 +348,7 @@ def read_package(workout_type: str, data: list[int]) -> Union[Running,
     instance of the class
     """
     types_training: dict[
-        str, type[Union[Running, Swimming, SportsWalking, Training]]
+        str, type[Training]
     ] = {
         'SWM': Swimming,
         'RUN': Running,
